@@ -279,6 +279,13 @@ td { border-top: 1px solid #f0f2f5; padding: 10px 12px; color: #69768b; font-siz
   --content-gutter: clamp(16px, 3vw, 40px);
   --panel-radius: 12px;
   --sidebar-width: 248px;
+  --background: var(--color-canvas);
+  --surface: var(--color-surface);
+  --text: var(--color-ink);
+  --muted: var(--color-muted);
+  --line: var(--color-border);
+  --blue: var(--color-primary);
+  --green: var(--color-success);
 }
 
 html { scroll-behavior: smooth; scroll-padding-top: 88px; }
@@ -468,4 +475,50 @@ td { font-size: 11px; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .button:hover { transform: none; }
+}
+
+
+/* Contrast and intermediate desktop-width corrections */
+.eyebrow,
+.page-heading p,
+.metric-top,
+.metric-note,
+.section-heading p,
+.summary-label,
+.collection-rate span,
+.chart-month,
+.chart-legend,
+.chart-bar span,
+.attention-item p,
+.attention-foot,
+.property-location,
+.occupancy-row,
+.property-rent,
+.tenant-cell small,
+.table-secondary,
+.date-cell,
+.maintenance-copy > span,
+.maintenance-meta,
+.demo-disclaimer,
+.app-footer,
+.breadcrumb,
+.profile-copy span,
+.workspace-label,
+.soon-label {
+  color: #5f6f86;
+}
+.nav-link { color: #52627a; }
+.nav-link.active { color: #244db7; }
+.nav-count { color: #98501e; }
+.status-good { color: #176746; }
+.status-warn, .status-pending { color: #85520f; }
+.priority-high { color: #a13e30; }
+.priority-medium { color: #80540e; }
+.priority-low { color: #176746; }
+.attention-icon.overdue { color: #a13e30; }
+.attention-icon.pending { color: #80540e; }
+
+@media (min-width: 1025px) and (max-width: 1180px) {
+  .sidebar { width: 220px; }
+  .main-column { margin-left: 220px; }
 }

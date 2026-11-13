@@ -115,7 +115,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               key={item.label}
               href={item.href}
               aria-label={item.label}
-              aria-current={activeHref === item.href ? "page" : undefined}
+              aria-current={activeHref === item.href ? "location" : undefined}
               title={item.label}
               className={activeHref === item.href ? "nav-link active" : "nav-link"}
               onClick={() => {
