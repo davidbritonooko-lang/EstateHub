@@ -87,7 +87,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="breadcrumb"><span>Workspace</span><span className="breadcrumb-separator">/</span><strong>Overview</strong></div>
           <div className="topbar-actions">
             <span className="demo-indicator"><span /> Demo environment</span>
-            <button className="icon-button" type="button" aria-label="Notifications">
+            <button className="icon-button" type="button" aria-label="Notifications (coming soon)" title="Notifications will be available in a future release" disabled>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>
               <i />
             </button>

@@ -18,11 +18,11 @@ function MetricIcon({ kind }: { kind: "building" | "users" | "wallet" | "trend" 
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{content}</svg>;
 }
 
-function SectionHeading({ title, subtitle, action }: { title: string; subtitle?: string; action?: string }) {
+function SectionHeading({ title, subtitle, action, actionHref = "#properties" }: { title: string; subtitle?: string; action?: string; actionHref?: string }) {
   return (
     <div className="section-heading">
       <div><h2>{title}</h2>{subtitle && <p>{subtitle}</p>}</div>
-      {action && <a className="text-link" href="#properties">{action}<span aria-hidden="true"> ↗</span></a>}
+      {action && <a className="text-link" href={actionHref}>{action}<span aria-hidden="true"> ↗</span></a>}
     </div>
   );
 }
@@ -34,7 +34,7 @@ export function Dashboard() {
 
   const metrics = [
     { label: "Total properties", value: String(properties.length).padStart(2, "0"), note: "Across your portfolio", kind: "building" as const, tone: "blue" },
-    { label: "Occupied units", value: `${occupiedUnits} / ${totalUnits}`, note: "89% occupancy rate", kind: "users" as const, tone: "violet" },
+    { label: "Occupied units", value: `${occupiedUnits} / ${totalUnits}`, note: "83% occupancy rate", kind: "users" as const, tone: "violet" },
     { label: "Monthly rent roll", value: currency.format(monthlyRent), note: "Expected this month", kind: "wallet" as const, tone: "green" },
     { label: "Rent outstanding", value: currency.format(86500), note: "Across 7 tenant accounts", kind: "trend" as const, tone: "amber" },
   ];
@@ -70,10 +70,10 @@ export function Dashboard() {
         <article className="panel collection-panel">
           <SectionHeading title="Rent collection" subtitle="Collection performance over the last 6 months" />
           <div className="collection-summary">
-            <div><span className="summary-label">Collected this month</span><strong>{currency.format(714000)}</strong></div>
+            <div><span className="summary-label">Collected this month</span><strong>{currency.format(557600)}</strong></div>
             <div className="collection-rate"><strong>82%</strong><span>of expected rent</span></div>
           </div>
-          <div className="chart" role="img" aria-label="Monthly rent collection: June 72 percent, July 84 percent, August 78 percent, September 91 percent, October 86 percent, November 68 percent.">
+          <div className="chart" role="img" aria-label="Monthly rent collection: June 72 percent, July 84 percent, August 78 percent, September 91 percent, October 86 percent, November 82 percent.">
             <div className="chart-grid-lines"><span /><span /><span /><span /></div>
             <div className="chart-bars">
               {monthlyCollection.map((item) => (
@@ -121,7 +121,7 @@ export function Dashboard() {
 
       <section className="bottom-grid">
         <article className="panel payments-panel" id="payments">
-          <SectionHeading title="Recent payments" subtitle="Latest payment activity across your units" action="View all" />
+          <SectionHeading title="Recent payments" subtitle="Latest payment activity across your units" action="View all" actionHref="#payments" />
           <div className="table-wrap">
             <table>
               <thead><tr><th>Tenant</th><th>Property / Unit</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
@@ -141,7 +141,7 @@ export function Dashboard() {
         </article>
 
         <article className="panel maintenance-panel" id="maintenance">
-          <SectionHeading title="Maintenance" subtitle="Recent maintenance activity" action="View all" />
+          <SectionHeading title="Maintenance" subtitle="Recent maintenance activity" action="View all" actionHref="#maintenance" />
           <div className="maintenance-list">
             {maintenanceRequests.map((request) => (
               <div className="maintenance-item" key={request.id}>
