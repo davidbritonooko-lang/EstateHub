@@ -61,12 +61,12 @@ export function Dashboard() {
           <article className="metric-card" key={metric.label}>
             <div className="metric-top"><span>{metric.label}</span><span className={`metric-icon ${metric.tone}`}><MetricIcon kind={metric.kind} /></span></div>
             <div className="metric-value">{metric.value}</div>
-            <div className="metric-note"><span className="note-dot" />{metric.note}</div>
+            <div className="metric-note"><span className="note-dot" aria-hidden="true" />{metric.note}</div>
           </article>
         ))}
       </section>
 
-      <section className="content-grid">
+      <section className="content-grid" aria-label="Collection performance and items needing attention">
         <article className="panel collection-panel">
           <SectionHeading title="Rent collection" subtitle="Collection performance over the last 6 months" />
           <div className="collection-summary">
@@ -74,8 +74,8 @@ export function Dashboard() {
             <div className="collection-rate"><strong>82%</strong><span>of expected rent</span></div>
           </div>
           <div className="chart" role="img" aria-label="Monthly rent collection: June 72 percent, July 84 percent, August 78 percent, September 91 percent, October 86 percent, November 82 percent.">
-            <div className="chart-grid-lines"><span /><span /><span /><span /></div>
-            <div className="chart-bars">
+            <div className="chart-grid-lines" aria-hidden="true"><span /><span /><span /><span /></div>
+            <div className="chart-bars" aria-hidden="true">
               {monthlyCollection.map((item) => (
                 <div className="chart-column" key={item.month}>
                   <div className={item.month === "Nov" ? "chart-bar current" : "chart-bar"} style={{ height: `${item.collected}%` }}><span>{item.collected}%</span></div>
@@ -84,34 +84,34 @@ export function Dashboard() {
               ))}
             </div>
           </div>
-          <div className="chart-legend"><span><i className="legend-current" /> Current month</span><span><i className="legend-history" /> Previous months</span></div>
+          <div className="chart-legend" aria-hidden="true"><span><i className="legend-current" /> Current month</span><span><i className="legend-history" /> Previous months</span></div>
         </article>
 
         <article className="panel attention-panel">
           <SectionHeading title="Needs attention" subtitle="Items that may need your review" />
           <div className="attention-list">
-            <div className="attention-item"><span className="attention-icon overdue">!</span><div><strong>7 rent balances overdue</strong><p>Tenants with outstanding rent balances</p></div><span className="attention-arrow">›</span></div>
-            <div className="attention-item"><span className="attention-icon pending">↻</span><div><strong>1 payment to confirm</strong><p>Review before recording as received</p></div><span className="attention-arrow">›</span></div>
-            <div className="attention-item"><span className="attention-icon maintenance">⌂</span><div><strong>3 maintenance requests</strong><p>Open or scheduled work orders</p></div><span className="attention-arrow">›</span></div>
+            <div className="attention-item"><span className="attention-icon overdue" aria-hidden="true">!</span><div><strong>7 rent balances overdue</strong><p>Tenants with outstanding rent balances</p></div><span className="attention-arrow" aria-hidden="true">›</span></div>
+            <div className="attention-item"><span className="attention-icon pending" aria-hidden="true">↻</span><div><strong>1 payment to confirm</strong><p>Review before recording as received</p></div><span className="attention-arrow" aria-hidden="true">›</span></div>
+            <div className="attention-item"><span className="attention-icon maintenance" aria-hidden="true">⌂</span><div><strong>3 maintenance requests</strong><p>Open or scheduled work orders</p></div><span className="attention-arrow" aria-hidden="true">›</span></div>
           </div>
           <div className="attention-foot">Demo figures are illustrative, not live account data.</div>
         </article>
       </section>
 
-      <section className="panel properties-panel" id="properties">
+      <section className="panel properties-panel" id="properties" aria-label="Property portfolio">
         <SectionHeading title="Your properties" subtitle="A quick look at your property portfolio" action="All properties" />
         <div className="property-grid">
           {properties.map((property) => (
             <article className="property-card" key={property.id}>
               <div className={`property-art art-${property.accent}`}>
                 <div className="building-illustration" aria-hidden="true"><span /><span /><span /><span /><span /><span /><span /><span /><span /></div>
-                <span className="property-initials">{property.initials}</span>
+                <span className="property-initials" aria-hidden="true">{property.initials}</span>
               </div>
               <div className="property-details">
                 <div className="property-title-row"><h3>{property.name}</h3><span className={property.status === "Occupied" ? "status-pill status-good" : "status-pill status-warn"}>{property.status}</span></div>
                 <p className="property-location"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></svg>{property.location}</p>
                 <div className="occupancy-row"><span>Occupancy</span><strong>{property.occupiedUnits}/{property.units} units</strong></div>
-                <div className="occupancy-track"><span style={{ width: `${(property.occupiedUnits / property.units) * 100}%` }} /></div>
+                <div className="occupancy-track" role="progressbar" aria-label={`${property.name} occupancy`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round((property.occupiedUnits / property.units) * 100)}><span style={{ width: `${(property.occupiedUnits / property.units) * 100}%` }} /></div>
                 <div className="property-rent"><span>Monthly rent roll</span><strong>{currency.format(property.monthlyRent)}</strong></div>
               </div>
             </article>
@@ -119,16 +119,17 @@ export function Dashboard() {
         </div>
       </section>
 
-      <section className="bottom-grid">
+      <section className="bottom-grid" aria-label="Recent payments and maintenance">
         <article className="panel payments-panel" id="payments">
           <SectionHeading title="Recent payments" subtitle="Latest payment activity across your units" action="View all" actionHref="#payments" />
-          <div className="table-wrap">
+          <div className="table-wrap" role="region" aria-label="Recent payment activity" tabIndex={0}>
             <table>
-              <thead><tr><th>Tenant</th><th>Property / Unit</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
+              <caption className="sr-only">Recent sample payments, including tenant, property, amount, date and status.</caption>
+              <thead><tr><th scope="col">Tenant</th><th scope="col">Property / Unit</th><th scope="col">Amount</th><th scope="col">Date</th><th scope="col">Status</th></tr></thead>
               <tbody>
                 {payments.map((payment, index) => (
                   <tr key={payment.id}>
-                    <td><div className="tenant-cell"><span className={`avatar tenant-avatar tenant-${index}`}>{payment.tenant.split(" ").map((part) => part[0]).join("")}</span><span><strong>{payment.tenant}</strong><small>{payment.id}</small></span></div></td>
+                    <td><div className="tenant-cell"><span className={`avatar tenant-avatar tenant-${index}`} aria-hidden="true">{payment.tenant.split(" ").map((part) => part[0]).join("")}</span><span><strong>{payment.tenant}</strong><small>{payment.id}</small></span></div></td>
                     <td><strong className="table-primary">{payment.property}</strong><small className="table-secondary">Unit {payment.unit}</small></td>
                     <td className="amount-cell">{currency.format(payment.amount)}</td>
                     <td className="date-cell">{payment.date}</td>
@@ -145,7 +146,7 @@ export function Dashboard() {
           <div className="maintenance-list">
             {maintenanceRequests.map((request) => (
               <div className="maintenance-item" key={request.id}>
-                <div className="maintenance-symbol">⌂</div>
+                <div className="maintenance-symbol" aria-hidden="true">⌂</div>
                 <div className="maintenance-copy"><strong>{request.title}</strong><span>{request.property} · {request.unit}</span><div className="maintenance-meta"><span className={`priority priority-${request.priority.toLowerCase()}`}>{request.priority} priority</span><span>{request.status}</span></div></div>
               </div>
             ))}

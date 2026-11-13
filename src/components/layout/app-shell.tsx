@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
 const primaryNavigation = [
@@ -9,11 +12,14 @@ const primaryNavigation = [
 ];
 
 const futureNavigation = [
+  "Units",
   "Tenants",
   "Tenancies",
+  "Arrears & credit",
   "Expenses",
   "Documents",
   "Reports",
+  "Settings",
 ];
 
 function BrandMark() {
@@ -38,18 +44,85 @@ function NavIcon({ name }: { name: string }) {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const [activeHref, setActiveHref] = useState("#overview");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const syncActiveLink = () => setActiveHref(window.location.hash || "#overview");
+    syncActiveLink();
+    window.addEventListener("hashchange", syncActiveLink);
+    return () => window.removeEventListener("hashchange", syncActiveLink);
+  }, []);
+
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+
+    const sidebar = document.querySelector<HTMLElement>(".sidebar.sidebar-open");
+    const focusable = sidebar?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])');
+    const first = focusable?.[0];
+    const last = focusable?.[focusable.length - 1];
+    first?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileNavOpen(false);
+        menuButtonRef.current?.focus();
+        return;
+      }
+      if (event.key === "Tab" && first && last) {
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileNavOpen]);
+
+  const closeMobileNavigation = () => {
+    setMobileNavOpen(false);
+    menuButtonRef.current?.focus();
+  };
+  const activeLabel = primaryNavigation.find((item) => item.href === activeHref)?.label ?? "Overview";
+
   return (
     <div className="app-frame">
-      <aside className="sidebar">
-        <Link className="brand" href="#overview" aria-label="EstateHub home">
+      <a className="skip-link" href="#overview">Skip to main content</a>
+      <button
+        className="mobile-nav-backdrop"
+        type="button"
+        aria-label="Close navigation"
+        hidden={!mobileNavOpen}
+        onClick={closeMobileNavigation}
+      />
+
+      <aside className={mobileNavOpen ? "sidebar sidebar-open" : "sidebar"} role={mobileNavOpen ? "dialog" : undefined} aria-modal={mobileNavOpen ? true : undefined} aria-label="EstateHub navigation">
+        <Link className="brand" href="#overview" aria-label="EstateHub home" onClick={() => { if (mobileNavOpen) closeMobileNavigation(); }}>
           <BrandMark />
           <span><strong>estatehub</strong><small>PROPERTY MANAGEMENT</small></span>
         </Link>
 
         <div className="workspace-label">WORKSPACE</div>
-        <nav aria-label="Main navigation" className="nav-group">
-          {primaryNavigation.map((item, index) => (
-            <Link key={item.label} href={item.href} className={index === 0 ? "nav-link active" : "nav-link"}>
+        <nav id="primary-navigation" aria-label="Primary navigation" className="nav-group">
+          {primaryNavigation.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              aria-label={item.label}
+              aria-current={activeHref === item.href ? "location" : undefined}
+              title={item.label}
+              className={activeHref === item.href ? "nav-link active" : "nav-link"}
+              onClick={() => {
+                setActiveHref(item.href);
+                if (mobileNavOpen) closeMobileNavigation();
+              }}
+            >
               <NavIcon name={item.icon} />
               <span>{item.label}</span>
               {item.label === "Maintenance" && <span className="nav-count">3</span>}
@@ -58,24 +131,24 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
 
         <div className="workspace-label secondary-label">MANAGE</div>
-        <nav aria-label="Additional modules" className="nav-group">
+        <nav aria-label="Planned modules" className="nav-group secondary-nav">
           {futureNavigation.map((label) => (
-            <span key={label} className="nav-link nav-disabled" aria-disabled="true" title="Planned for a future release">
+            <span key={label} className="nav-link nav-disabled" aria-disabled="true" title={`${label} is planned for a future release`}>
               <span className="nav-dot" aria-hidden="true" />
               <span>{label}</span>
-              <span className="soon-label">Soon</span>
+              <span className="soon-label">Planned</span>
             </span>
           ))}
         </nav>
 
         <div className="sidebar-bottom">
           <div className="help-card">
-            <div className="help-icon">?</div>
+            <div className="help-icon" aria-hidden="true">?</div>
             <strong>Need a hand?</strong>
             <p>Help and guidance will be available as the workspace grows.</p>
           </div>
           <div className="profile-row">
-            <div className="avatar avatar-owner">BO</div>
+            <div className="avatar avatar-owner" role="img" aria-label="Demo profile initials B O">BO</div>
             <div className="profile-copy"><strong>Property Owner</strong><span>Demo workspace</span></div>
             <span className="profile-menu" aria-hidden="true">···</span>
           </div>
@@ -84,17 +157,31 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <div className="main-column">
         <header className="topbar">
-          <div className="breadcrumb"><span>Workspace</span><span className="breadcrumb-separator">/</span><strong>Overview</strong></div>
+          <div className="topbar-leading">
+            <button
+              ref={menuButtonRef}
+              className="mobile-menu-toggle"
+              type="button"
+              aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={mobileNavOpen}
+              aria-controls="primary-navigation"
+              onClick={() => setMobileNavOpen((open) => !open)}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                {mobileNavOpen ? <path d="m6 6 12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+              </svg>
+            </button>
+            <div className="breadcrumb"><span>Workspace</span><span className="breadcrumb-separator">/</span><strong>{activeLabel}</strong></div>
+          </div>
           <div className="topbar-actions">
-            <span className="demo-indicator"><span /> Demo environment</span>
+            <span className="demo-indicator"><span aria-hidden="true" /> Demo environment</span>
             <button className="icon-button" type="button" aria-label="Notifications (coming soon)" title="Notifications will be available in a future release" disabled>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>
-              <i />
             </button>
-            <div className="avatar avatar-top" aria-label="Demo profile">BO</div>
+            <div className="avatar avatar-top" role="img" aria-label="Demo profile initials B O">BO</div>
           </div>
         </header>
-        <main id="overview" className="main-content">{children}</main>
+        <main id="overview" className="main-content" tabIndex={-1}>{children}</main>
         <footer className="app-footer"><span>EstateHub <span className="footer-dot">·</span> Foundation release</span><span>Sample data only <span className="footer-dot">·</span> KSh</span></footer>
       </div>
     </div>
