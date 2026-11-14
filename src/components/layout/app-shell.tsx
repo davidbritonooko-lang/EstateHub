@@ -116,26 +116,14 @@ export function AppShell({ children }: { children: ReactNode }) {
         </Link>
 
         <div className="workspace-label">WORKSPACE</div>
-        <nav id="primary-navigation" aria-label="Primary navigation" className="nav-group">
-          {primaryNavigation.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              aria-label={item.label}
-              aria-current={activeHref === item.href ? "location" : undefined}
-              title={item.label}
-              className={activeHref === item.href ? "nav-link active" : "nav-link"}
-              onClick={() => {
-                setActiveHref(item.href);
-                if (mobileNavOpen) closeMobileNavigation();
-              }}
-            >
-              <NavIcon name={item.icon} />
-              <span>{item.label}</span>
-              {item.label === "Maintenance" && <span className="nav-count">3</span>}
-            </Link>
-          ))}
-        </nav>
+        {isTenant ? <nav id="primary-navigation" aria-label="Tenant navigation" className="nav-group">
+          <Link className="nav-link" href="/tenant"><NavIcon name="grid" /><span>Overview</span></Link>
+          <Link className="nav-link" href="/tenant/notifications"><NavIcon name="grid" /><span>Notifications</span>{unreadCount > 0 && <span className="nav-count">{unreadCount}</span>}</Link>
+        </nav> : <nav id="primary-navigation" aria-label="Primary navigation" className="nav-group">
+          {primaryNavigation.map((item) => <Link key={item.label} href={item.href} aria-label={item.label} aria-current={activeHref === item.href ? "location" : undefined} title={item.label} className={activeHref === item.href ? "nav-link active" : "nav-link"} onClick={() => { setActiveHref(item.href); if (mobileNavOpen) closeMobileNavigation(); }}>
+            <NavIcon name={item.icon} /><span>{item.label}</span>{item.label === "Maintenance" && <span className="nav-count">3</span>}
+          </Link>)}
+        </nav>}
 
         <div className="workspace-label secondary-label">COMMUNICATIONS</div>
         <nav aria-label="Notifications" className="nav-group">
