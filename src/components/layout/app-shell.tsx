@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useNotifications } from "@/components/notifications/notification-context";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
@@ -44,6 +46,11 @@ function NavIcon({ name }: { name: string }) {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const isTenant = pathname.startsWith("/tenant");
+  const { notices } = useNotifications();
+  const unreadCount = notices.filter((notice) => notice.status === "sent" && notice.recipients.includes("tenant-1") && !notice.readBy.includes("tenant-1")).length;
   const [activeHref, setActiveHref] = useState("#overview");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -130,7 +137,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
 
-        <div className="workspace-label secondary-label">MANAGE</div>
+        <div className="workspace-label secondary-label">COMMUNICATIONS</div>
+        <nav aria-label="Notifications" className="nav-group">
+          <Link className="nav-link" href={isTenant ? "/tenant/notifications" : "/notifications"} onClick={() => setMobileNavOpen(false)}><NavIcon name="grid" /><span>Notifications</span>{isTenant && unreadCount > 0 && <span className="nav-count">{unreadCount}</span>}</Link>
+        </nav>
+        {!isTenant && <><div className="workspace-label secondary-label">MANAGE</div>
         <nav aria-label="Planned modules" className="nav-group secondary-nav">
           {futureNavigation.map((label) => (
             <span key={label} className="nav-link nav-disabled" aria-disabled="true" title={`${label} is planned for a future release`}>
@@ -148,8 +159,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             <p>Help and guidance will be available as the workspace grows.</p>
           </div>
           <div className="profile-row">
-            <div className="avatar avatar-owner" role="img" aria-label="Demo profile initials B O">BO</div>
-            <div className="profile-copy"><strong>Property Owner</strong><span>Demo workspace</span></div>
+            <div className="avatar avatar-owner" role="img" aria-label={isTenant ? "Tenant demo profile" : "Landlord demo profile"}>{isTenant ? "WN" : "BO"}</div>
+            <div className="profile-copy"><strong>{isTenant ? "Wanjiku Njeri" : "Property Owner"}</strong><span>{isTenant ? "Tenant demo account" : "Landlord demo account"}</span></div>
             <span className="profile-menu" aria-hidden="true">···</span>
           </div>
         </div>
@@ -175,13 +186,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
           <div className="topbar-actions">
             <span className="demo-indicator"><span aria-hidden="true" /> Demo environment</span>
-            <button className="icon-button" type="button" aria-label="Notifications (coming soon)" title="Notifications will be available in a future release" disabled>
+            <label className="account-switch-label"><span className="sr-only">Preview account</span><select aria-label="Switch demo account" value={isTenant ? "tenant" : "landlord"} onChange={(event) => router.push(event.target.value === "tenant" ? "/tenant" : "/")}><option value="landlord">Landlord preview</option><option value="tenant">Tenant preview</option></select></label>
+            <Link className="icon-button" href={isTenant ? "/tenant/notifications" : "/notifications"} aria-label={isTenant ? "Open tenant notifications" : "Open notification centre"} title="Open notifications">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>
             </button>
-            <div className="avatar avatar-top" role="img" aria-label="Demo profile initials B O">BO</div>
+            <div className="avatar avatar-top" role="img" aria-label={isTenant ? "Tenant demo profile" : "Landlord demo profile"}>{isTenant ? "WN" : "BO"}</div>
           </div>
         </header>
-        <main id="overview" className="main-content" tabIndex={-1}>{children}</main>
+        <main id="overview" className="main-content" tabIndex={-1}>{isTenant && pathname === "/" ? <div className="sr-only">Tenant preview</div> : children}</main>
         <footer className="app-footer"><span>EstateHub <span className="footer-dot">·</span> Foundation release</span><span>Sample data only <span className="footer-dot">·</span> KSh</span></footer>
       </div>
     </div>
