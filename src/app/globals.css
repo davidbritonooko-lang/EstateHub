@@ -556,3 +556,5 @@ td { font-size: 11px; }
 @media(max-width:460px){.account-switch-label select{max-width:94px}.notice-row{align-items:flex-start;flex-direction:column}.inbox-trigger{gap:8px;padding:12px 6px}.inbox-title-wrap>span{max-width:190px}.inbox-trigger .notice-read,.inbox-trigger .notice-unread{font-size:8px}.tenant-metrics{grid-template-columns:1fr}.wizard-steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.wizard-step{text-align:left}}
 
 .field-error{color:#a13e30!important;font-size:10px!important;font-weight:600!important}
+
+.incorrect-notice{text-decoration:line-through;text-decoration-thickness:1.5px;color:#8a4a42!important}
