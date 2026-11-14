@@ -138,7 +138,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="soon-label">Planned</span>
             </span>
           ))}
-        </nav>
+        </nav></>}
 
         <div className="sidebar-bottom">
           <div className="help-card">
