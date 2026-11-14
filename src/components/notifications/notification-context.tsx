@@ -1,0 +1,12 @@
+"use client";
+import {createContext,useContext,useMemo,useState} from "react";
+import type {ReactNode} from "react";
+export type Notice={id:string;title:string;body:string;category:string;recipients:string[];recipientLabel:string;status:"draft"|"scheduled"|"sent"|"failed"|"cancelled";createdAt:string;scheduledAt?:string;readBy:string[];incorrect?:boolean;history:string[]};
+const initial:Notice[]=[
+{id:"N-104",title:"Water supply interruption",body:"The water supply will be interrupted on Saturday between 10:00 AM and 1:00 PM while routine maintenance is carried out. Please store enough water in advance.",category:"Maintenance",recipients:["tenant-1","tenant-2","tenant-3"],recipientLabel:"All active tenants",status:"sent",createdAt:"14 Nov 2026, 08:30",readBy:["tenant-1"],history:["Created by Demo Landlord","Sent to 3 demo tenants"]},
+{id:"N-103",title:"November rent reminder",body:"Please review your November rent balance and account statement. Contact the landlord if you need clarification.",category:"Rent",recipients:["tenant-1","tenant-2"],recipientLabel:"Residential tenants",status:"scheduled",createdAt:"13 Nov 2026, 15:10",scheduledAt:"20 Nov 2026, 09:00",readBy:[],history:["Created by Demo Landlord","Scheduled for 20 Nov 2026 at 09:00"]},
+{id:"N-102",title:"Inspection notice",body:"A routine property inspection is planned. The landlord will confirm the relevant unit and timing separately.",category:"General",recipients:["tenant-1"],recipientLabel:"Wanjiku Njeri",status:"sent",createdAt:"10 Nov 2026, 11:15",readBy:["tenant-1"],history:["Created by Demo Landlord","Sent to 1 demo tenant"]}];
+type Value={notices:Notice[];add:(n:Notice)=>void;update:(id:string,patch:Partial<Notice>,event:string)=>void;read:(id:string,tenant:string)=>void;readAll:(tenant:string)=>void};
+const C=createContext<Value|null>(null);
+export function NotificationProvider({children}:{children:ReactNode}){const [notices,setNotices]=useState(initial);const value=useMemo<Value>(()=>({notices,add:n=>setNotices(a=>[n,...a]),update:(id,p,event)=>setNotices(a=>a.map(n=>n.id===id?{...n,...p,history:[...n.history,event]}:n)),read:(id,t)=>setNotices(a=>a.map(n=>n.id===id&&!n.readBy.includes(t)?{...n,readBy:[...n.readBy,t]}:n)),readAll:t=>setNotices(a=>a.map(n=>n.status==="sent"&&n.recipients.includes(t)&&!n.readBy.includes(t)?{...n,readBy:[...n.readBy,t]}:n))}),[notices]);return <C.Provider value={value}>{children}</C.Provider>}
+export function useNotifications(){const v=useContext(C);if(!v)throw new Error("NotificationProvider is missing");return v;}
